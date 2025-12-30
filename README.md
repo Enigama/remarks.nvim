@@ -111,4 +111,6 @@ When in the Remarks picker:
 ## License
 
 MIT
+## 🤝 Contributing
 
+Contributions are welcome! Please feel free to submit a Pull Request.
