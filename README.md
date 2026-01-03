@@ -16,6 +16,7 @@ Neovim plugin for [git-remarks](https://github.com/Enigama/git-remarks) — pers
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 
 ## Installation
+Before install the plugin make sure that yo have installed [git-remarks](https://github.com/Enigama/git-remarks)
 
 ### lazy.nvim
 
