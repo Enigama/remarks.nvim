@@ -82,7 +82,8 @@ function M.pick_remarks(opts)
           "---",
           "",
         }
-        for line in remark.body:gmatch("[^\r\n]+") do
+        local body_lines = vim.split(remark.body, "\n", { plain = true })
+        for _, line in ipairs(body_lines) do
           table.insert(lines, line)
         end
         vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
@@ -148,6 +149,18 @@ function M.pick_remarks(opts)
 
       map("i", "<C-t>", edit_in_tab)
       map("n", "<C-t>", edit_in_tab)
+
+      -- <C-e> - Edit with visual selection context
+      local edit_with_context = function()
+        local selection = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        if selection then
+          require("remarks.buffer").edit_remark(selection.value, { include_visual_context = true })
+        end
+      end
+
+      map("i", "<C-e>", edit_with_context)
+      map("n", "<C-e>", edit_with_context)
 
       return true
     end,
