@@ -7,6 +7,7 @@ Neovim plugin for [git-remarks](https://github.com/Enigama/git-remarks) — pers
 - **Telescope integration** — Browse, edit, and resolve remarks with fuzzy finding
 - **Quick add** — Add remarks via input prompt
 - **Full add** — Add remarks with YAML template in a buffer
+- **Visual selection context** — Automatically add file context from visual selection when editing remarks
 - **Configurable** — Float, split, vsplit, or tab for edit buffers
 
 ## Requirements
@@ -76,9 +77,11 @@ When in the Remarks picker:
 
 | Key | Action |
 |-----|--------|
-| `<CR>` | Edit selected remark |
+| `<CR>` | View selected remakr |
+| `<C-e>` | Edit selected remark with visual selection context |
 | `d` / `x` / `<C-d>` | Resolve (delete) selected remark |
 | `a` / `<C-a>` | Add new remark |
+| `<C-t>` | Edit selected remark in new tab |
 
 ## Example Workflow
 
@@ -107,6 +110,13 @@ When in the Remarks picker:
 
 " Show remarks on current commit
 :RemarksShow
+
+" Edit remark with visual selection context
+" 1. Make a visual selection in your file (e.g., lines 25-35)
+" 2. Open :Remarks picker
+" 3. Press <C-e> on a remark
+" 4. File context (file: path/to/file.ts:25-35) is automatically added
+" 5. Start typing your comment immediately (already in insert mode)
 ```
 
 ## License
