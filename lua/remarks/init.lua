@@ -20,11 +20,5 @@ function M.setup(opts)
   require("remarks.commands").setup()
 end
 
---- Check if git-remarks CLI is available
----@return boolean
-function M.is_available()
-  return vim.fn.executable("git-remarks") == 1
-end
-
 return M
 

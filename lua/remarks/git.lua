@@ -38,17 +38,6 @@ function M.list()
   return { success = true, remarks = remarks, error = nil }
 end
 
---- Show remarks on a specific commit
----@param commit string|nil Commit SHA (default: HEAD)
----@return { success: boolean, output: string, error: string|nil }
-function M.show(commit)
-  local args = { "show" }
-  if commit then
-    table.insert(args, commit)
-  end
-  return execute(args)
-end
-
 --- Add a remark
 ---@param body string Remark body text
 ---@param opts { type: string|nil, commit: string|nil }|nil Options
@@ -76,15 +65,6 @@ end
 ---@return { success: boolean, output: string, error: string|nil }
 function M.resolve(id)
   return execute({ "resolve", id })
-end
-
---- Edit a remark (get current content)
----@param id string Remark ID
----@return { success: boolean, output: string, error: string|nil }
-function M.edit(id)
-  -- We'll use the show command to get the remark content
-  -- The actual edit is done by resolve + add
-  return execute({ "edit", id })
 end
 
 --- Initialize git-remarks hooks
@@ -127,7 +107,9 @@ function M.parse_list_output(output)
   --   body text
   local current_remark = nil
 
-  for line in output:gmatch("[^\r\n]+") do
+  -- Split by newlines to preserve empty lines
+  local lines = vim.split(output, "\n", { plain = true })
+  for _, line in ipairs(lines) do
     -- Check for remark header line: [a1b2c3d4] thought · 2h ago · abc1234 (HEAD)
     local id, rtype, age, sha = line:match("^%[(%w+)%]%s+(%w+)%s+·%s+(.-)%s+·%s+(%w+)")
     if id then
@@ -143,13 +125,20 @@ function M.parse_list_output(output)
         body = "",
       }
     elseif current_remark then
-      -- Body line (starts with spaces)
+      -- Body line (starts with two spaces) or empty line in body
       local body_line = line:match("^%s%s(.+)")
       if body_line then
+        -- Non-empty body line (has content after 2 spaces)
         if current_remark.body ~= "" then
           current_remark.body = current_remark.body .. "\n"
         end
         current_remark.body = current_remark.body .. body_line
+      elseif line == "" or line:match("^%s?%s?$") then
+        -- Empty line or line with 0-2 spaces only - preserve as empty line in body
+        if current_remark.body ~= "" then
+          current_remark.body = current_remark.body .. "\n"
+        end
+        -- Empty line is represented by empty string, which is already handled by the \n above
       end
     end
   end
@@ -159,20 +148,6 @@ function M.parse_list_output(output)
   end
 
   return remarks
-end
-
---- Get raw YAML content for a remark (for preview)
----@param commit string Commit SHA
----@return string|nil
-function M.get_remark_yaml(commit)
-  local result = vim.system({
-    "git", "notes", "--ref=remarks", "show", commit
-  }, { text = true }):wait()
-
-  if result.code == 0 then
-    return result.stdout
-  end
-  return nil
 end
 
 return M
