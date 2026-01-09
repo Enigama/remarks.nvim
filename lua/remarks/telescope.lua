@@ -53,12 +53,17 @@ function M.pick_remarks(opts)
     finder = finders.new_table({
       results = remarks,
       entry_maker = function(remark)
+        -- Extract first line of body as preview
+        local preview = remark.body:match("^[^\r\n]+") or ""
+        if #preview > 50 then
+          preview = preview:sub(1, 47) .. "..."
+        end
+
         local display = string.format(
-          "[%s] %s · %s · %s%s",
+          "[%s] %s: %s%s",
           remark.id,
           remark.type,
-          remark.age,
-          remark.sha,
+          preview,
           remark.is_head and " (HEAD)" or ""
         )
         return {
