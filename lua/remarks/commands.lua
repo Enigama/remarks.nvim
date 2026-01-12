@@ -3,11 +3,11 @@ local M = {}
 function M.setup()
   local git = require("remarks.git")
 
-  -- :Remarks - Open Telescope picker with all active remarks
+  -- :Remarks - Open picker with all active remarks
   vim.api.nvim_create_user_command("Remarks", function()
-    require("remarks.telescope").pick_remarks()
+    require("remarks.picker").pick_remarks()
   end, {
-    desc = "Open Telescope picker with all active remarks",
+    desc = "Open picker with all active remarks",
   })
 
   -- :RemarksAdd [type] - Quick add via vim.ui.input
@@ -29,9 +29,9 @@ function M.setup()
     desc = "Add a remark via buffer with full template",
   })
 
-  -- :RemarksShow - Telescope picker filtered to current commit
+  -- :RemarksShow - Picker filtered to current commit
   vim.api.nvim_create_user_command("RemarksShow", function()
-    require("remarks.telescope").pick_remarks({ commit = "HEAD" })
+    require("remarks.picker").pick_remarks({ commit = "HEAD" })
   end, {
     desc = "Show remarks on current commit",
   })
