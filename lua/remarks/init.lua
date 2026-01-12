@@ -8,9 +8,7 @@ M.config = {
     height = 0.4,    -- float height
   },
   default_type = "thought",
-  telescope = {
-    theme = nil, -- "dropdown" | "ivy" | "cursor" | nil
-  },
+  picker = nil, -- function(remarks, opts) | nil for vim.ui.select fallback
 }
 
 --- Setup the remarks plugin
