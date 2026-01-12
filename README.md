@@ -16,6 +16,7 @@ Neovim plugin for [git-remarks](https://github.com/Enigama/git-remarks) — pers
 - [git-remarks](https://github.com/Enigama/git-remarks) CLI installed and in PATH
 
 ## Installation
+Before install the plugin make sure that you have installed [git-remarks](https://github.com/Enigama/git-remarks)
 
 ### lazy.nvim
 
@@ -434,3 +435,7 @@ To use a custom picker, provide a function that receives:
 ## License
 
 MIT
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
