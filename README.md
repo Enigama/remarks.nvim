@@ -7,6 +7,7 @@ Neovim plugin for [git-remarks](https://github.com/Enigama/git-remarks) — pers
 - **Bring your own picker** — Use telescope, fzf-lua, mini.pick, snacks.nvim, or any picker you prefer
 - **Quick add** — Add remarks via input prompt
 - **Full add** — Add remarks with YAML template in a buffer
+- **Visual selection context** — Automatically add file context from visual selection when editing remarks
 - **Configurable** — Float, split, vsplit, or tab for edit buffers
 - **Zero dependencies** — Falls back to `vim.ui.select()` when no picker is configured
 
@@ -71,6 +72,16 @@ By default, remarks.nvim uses `vim.ui.select()` which works out of the box and c
 To use a custom picker, provide a function that receives:
 - `remarks` — List of remark objects with fields: `id`, `type`, `age`, `sha`, `is_head`, `body`
 - `opts` — Options table (e.g., `{ commit = "HEAD" }` when filtering by commit)
+
+### Recommended Keybindings
+
+| Key | Action |
+|-----|--------|
+| `<CR>` | Edit selected remark |
+| `<C-e>` | Edit remark with visual selection context |
+| `d` / `x` / `<C-d>` | Resolve (delete) selected remark |
+| `a` / `<C-a>` | Add new remark |
+| `<C-t>` | Edit selected remark in new tab |
 
 ### Telescope
 
@@ -192,6 +203,18 @@ To use a custom picker, provide a function that receives:
           map("i", "<C-t>", edit_in_tab)
           map("n", "<C-t>", edit_in_tab)
 
+          -- <C-e> - Edit with visual selection context
+          local edit_with_context = function()
+            local selection = action_state.get_selected_entry()
+            actions.close(prompt_bufnr)
+            if selection then
+              require("remarks.buffer").edit_remark(selection.value, { include_visual_context = true })
+            end
+          end
+
+          map("i", "<C-e>", edit_with_context)
+          map("n", "<C-e>", edit_with_context)
+
           return true
         end,
       }):find()
@@ -289,6 +312,12 @@ To use a custom picker, provide a function that receives:
               end
             end
           end,
+          ["ctrl-e"] = function(selected)
+            if selected[1] then
+              local remark = remark_map[selected[1]]
+              require("remarks.buffer").edit_remark(remark, { include_visual_context = true })
+            end
+          end,
         },
       })
     end
@@ -335,6 +364,20 @@ To use a custom picker, provide a function that receives:
               end)
             end
           end,
+        },
+        mappings = {
+          edit_context = {
+            char = "<C-e>",
+            func = function()
+              local item = MiniPick.get_picker_matches().current
+              if item then
+                MiniPick.stop()
+                vim.schedule(function()
+                  require("remarks.buffer").edit_remark(item.remark, { include_visual_context = true })
+                end)
+              end
+            end,
+          },
         },
       })
     end
@@ -398,6 +441,22 @@ To use a custom picker, provide a function that receives:
             require("remarks.buffer").edit_remark(item.remark)
           end
         end,
+        actions = {
+          edit_context = function(picker)
+            local item = picker:current()
+            picker:close()
+            if item then
+              require("remarks.buffer").edit_remark(item.remark, { include_visual_context = true })
+            end
+          end,
+        },
+        win = {
+          input = {
+            keys = {
+              ["<C-e>"] = { "edit_context", mode = { "i", "n" } },
+            },
+          },
+        },
       })
     end
 
@@ -435,6 +494,13 @@ To use a custom picker, provide a function that receives:
 
 " Show remarks on current commit
 :RemarksShow
+
+" Edit remark with visual selection context
+" 1. Make a visual selection in your file (e.g., lines 25-35)
+" 2. Open :Remarks picker
+" 3. Press <C-e> on a remark
+" 4. File context (file: path/to/file.ts:25-35) is automatically added
+" 5. Start typing your comment immediately (already in insert mode)
 ```
 
 ## License
